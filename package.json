@@ -1,0 +1,110 @@
+{
+  "name": "bankrec",
+  "version": "1.0.0",
+  "description": "Bank Reconciliation Electron App - A secure desktop application for managing and reconciling bank transactions",
+  "main": "dist/main/main.js",
+  "scripts": {
+    "compile": "tsc",
+    "compile:watch": "tsc --watch",
+    "start": "yarn compile && yarn build:css && electron .",
+    "build:css": "tailwindcss -c ./config/tailwind.config.js -i ./src/styles/input.css -o ./src/styles/styles.css --minify",
+    "build:css:watch": "tailwindcss -c ./config/tailwind.config.js -i ./src/styles/input.css -o ./src/styles/styles.css --watch",
+    "dev": "yarn compile && yarn build:css:watch & electron .",
+    "dev:watch": "concurrently \"yarn compile:watch\" \"yarn build:css:watch\" \"electron .\"",
+    "build": "yarn compile && yarn build:css && electron-builder",
+    "build:mac": "yarn compile && yarn build:css && electron-builder --mac",
+    "build:win": "yarn compile && yarn build:css && electron-builder --win",
+    "generate-icons": "cd assets && ./generate-icons.sh",
+    "preview-icons": "open assets/preview.html",
+    "reset-db": "rm -f ~/Library/Application\\ Support/bankrec/data/bankrec.db && echo 'Database reset complete. Restart the app to create a fresh database.'",
+    "security-check": "yarn audit",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
+  },
+  "keywords": [
+    "electron",
+    "bank",
+    "reconciliation",
+    "finance",
+    "encryption",
+    "desktop-app",
+    "cross-platform"
+  ],
+  "author": "yangtheman",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yangtheman/bankrec.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yangtheman/bankrec/issues"
+  },
+  "homepage": "https://github.com/yangtheman/bankrec#readme",
+  "devDependencies": {
+    "@jest/globals": "^30.2.0",
+    "@tailwindcss/cli": "^4.1.17",
+    "@types/better-sqlite3": "^7.6.13",
+    "@types/crypto-js": "^4.2.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.10.1",
+    "autoprefixer": "^10.4.21",
+    "daisyui": "^5.4.7",
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4",
+    "electron-rebuild": "^3.2.9",
+    "jest": "^30.2.0",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
+    "ts-jest": "^29.4.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.3"
+  },
+  "dependencies": {
+    "better-sqlite3": "^12.4.1",
+    "crypto-js": "^4.2.0"
+  },
+  "optionalDependencies": {
+    "keytar": "^7.9.0"
+  },
+  "build": {
+    "appId": "com.bankrec.app",
+    "productName": "BankRec",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "category": "public.app-category.finance",
+      "icon": "assets/icon.icns",
+      "target": [
+        "dmg",
+        "zip"
+      ]
+    },
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "linux": {
+      "icon": "assets/icon.png",
+      "target": [
+        "AppImage",
+        "deb"
+      ]
+    },
+    "files": [
+      "dist/**/*",
+      "src/views/**/*",
+      "src/styles/**/*",
+      "src/renderer/**/*.js",
+      "assets/**/*",
+      "!**/*.ts",
+      "!*.map",
+      "!src/main/**/*.js",
+      "!src/preload/**/*.js"
+    ]
+  }
+}

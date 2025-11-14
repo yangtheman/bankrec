@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BankRec Icon Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 40px 20px;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            color: #333;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            text-align: center;
+            color: #1E40AF;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+        }
+        .icon-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 30px;
+        }
+        .icon-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .icon-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .icon-item img {
+            display: block;
+            margin: 0 auto 15px;
+        }
+        .icon-label {
+            font-weight: 600;
+            color: #1E40AF;
+            margin-bottom: 5px;
+        }
+        .icon-size {
+            font-size: 12px;
+            color: #999;
+        }
+        .hero-icon {
+            text-align: center;
+            margin: 40px 0;
+            padding: 40px;
+            background: linear-gradient(135deg, #1E40AF 0%, #3B82F6 100%);
+            border-radius: 20px;
+        }
+        .hero-icon img {
+            display: block;
+            margin: 0 auto;
+            filter: drop-shadow(0 20px 40px rgba(0,0,0,0.3));
+        }
+        .features {
+            margin-top: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+        .feature {
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            border-left: 4px solid #10B981;
+        }
+        .feature h3 {
+            color: #1E40AF;
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏦 BankRec Logo</h1>
+        <p class="subtitle">Custom icon for your Bank Reconciliation app</p>
+        
+        <div class="hero-icon">
+            <img src="icon.png" alt="BankRec Icon" width="256" height="256">
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <h3>🏛️ Bank Building</h3>
+                <p>Classical pillars represent financial institutions and stability</p>
+            </div>
+            <div class="feature">
+                <h3>✓ Checkmark</h3>
+                <p>Green badge symbolizes successful reconciliation and verification</p>
+            </div>
+            <div class="feature">
+                <h3>🎨 Professional Colors</h3>
+                <p>Blue gradient conveys trust, stability, and professionalism</p>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 50px; color: #1E40AF;">Icon Sizes</h2>
+        <div class="icon-grid">
+            <div class="icon-item">
+                <img src="icon_16x16.png" alt="16x16" width="16" height="16">
+                <div class="icon-label">Tiny</div>
+                <div class="icon-size">16×16</div>
+            </div>
+            <div class="icon-item">
+                <img src="icon_32x32.png" alt="32x32" width="32" height="32">
+                <div class="icon-label">Small</div>
+                <div class="icon-size">32×32</div>
+            </div>
+            <div class="icon-item">
+                <img src="icon_64x64.png" alt="64x64" width="64" height="64">
+                <div class="icon-label">Medium</div>
+                <div class="icon-size">64×64</div>
+            </div>
+            <div class="icon-item">
+                <img src="icon_128x128.png" alt="128x128" width="128" height="128">
+                <div class="icon-label">Large</div>
+                <div class="icon-size">128×128</div>
+            </div>
+            <div class="icon-item">
+                <img src="icon_256x256.png" alt="256x256" width="128" height="128">
+                <div class="icon-label">Extra Large</div>
+                <div class="icon-size">256×256 (scaled)</div>
+            </div>
+            <div class="icon-item">
+                <img src="icon_512x512.png" alt="512x512" width="128" height="128">
+                <div class="icon-label">Huge</div>
+                <div class="icon-size">512×512 (scaled)</div>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; padding: 20px; background: #FEF3C7; border-radius: 12px; border-left: 4px solid #F59E0B;">
+            <h3 style="margin-top: 0; color: #D97706;">📦 Platform-Specific Formats Generated:</h3>
+            <ul style="margin: 10px 0;">
+                <li><strong>macOS:</strong> icon.icns</li>
+                <li><strong>Windows:</strong> icon.ico</li>
+                <li><strong>Linux:</strong> icon.png</li>
+                <li><strong>Web/Development:</strong> All PNG sizes</li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,76 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Build outputs
+dist/
+build/
+out/
+
+# Compiled JavaScript files (TypeScript compilation outputs)
+# Only ignore compiled outputs in main and preload, but keep renderer/app.js
+src/main/**/*.js
+src/preload/**/*.js
+!src/**/*.test.js
+
+# Test coverage
+coverage/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Database files
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+
+# Encrypted backup files
+*.enc
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# IDE and editor files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# User data directory (contains sensitive user data)
+# Note: This is typically stored in the OS app data folder
+# but adding it here in case of local testing
+data/
+userData/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Certificate files (if you use code signing)
+*.p12
+*.pfx
+*.cer
+*.crt
+*.key
+*.pem
+
+# macOS code signing
+*.provisionprofile

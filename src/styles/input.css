@@ -1,0 +1,32 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+/* Custom styles that work with Tailwind */
+@layer components {
+  /* Screen transitions */
+  .screen {
+    @apply hidden min-h-screen;
+  }
+  
+  .screen.active {
+    @apply block;
+  }
+  
+  /* Theme transition */
+  html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+}
+
+/* Additional custom styles */
+@layer utilities {
+  .modal-open {
+    display: grid !important;
+    place-items: center !important;
+  }
+  
+  /* Ensure category modal appears above transaction modal */
+  #category-modal {
+    z-index: 1000;
+  }
+}
