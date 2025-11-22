@@ -14,6 +14,14 @@ let filteredTransactions = [];
 let saveAndAddAnother = false;
 let editingTransactionId = null;
 
+// Helper function to format currency with commas
+function formatCurrency(amount) {
+  return parseFloat(amount).toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
+}
+
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('App loaded, checking for existing data...');
@@ -263,7 +271,7 @@ function calculateBalance() {
   });
   
   appData.balance = balance;
-  document.getElementById('current-balance').textContent = '$' + balance.toFixed(2);
+  document.getElementById('current-balance').textContent = '$' + formatCurrency(balance);
 }
 
 function renderTransactions() {
@@ -309,23 +317,27 @@ function renderPaginatedTransactions() {
   const endIndex = Math.min(startIndex + itemsPerPage, filteredTransactions.length);
   const pageTransactions = filteredTransactions.slice(startIndex, endIndex);
   
-  let balance = 0;
+  // Pre-calculate balances for each transaction based on ALL transactions in chronological order
+  const transactionBalances = new Map();
+  const sortedAllTransactions = [...appData.transactions].sort((a, b) => {
+    const dateCompare = new Date(a.date) - new Date(b.date);
+    if (dateCompare !== 0) return dateCompare;
+    // If dates are equal, maintain stable sort by id
+    return a.id.localeCompare(b.id);
+  });
   
-  for (let i = 0; i < startIndex; i++) {
-    const t = filteredTransactions[i];
+  let runningBalance = 0;
+  sortedAllTransactions.forEach(t => {
     if (t.type === 'credit') {
-      balance += parseFloat(t.amount);
+      runningBalance += parseFloat(t.amount);
     } else {
-      balance -= parseFloat(t.amount);
+      runningBalance -= parseFloat(t.amount);
     }
-  }
+    transactionBalances.set(t.id, runningBalance);
+  });
   
   pageTransactions.forEach(transaction => {
-    if (transaction.type === 'credit') {
-      balance += parseFloat(transaction.amount);
-    } else {
-      balance -= parseFloat(transaction.amount);
-    }
+    const balance = transactionBalances.get(transaction.id) || 0;
     
     const row = document.createElement('tr');
     row.innerHTML = `
@@ -333,9 +345,9 @@ function renderPaginatedTransactions() {
       <td>${transaction.checkNumber || '-'}</td>
       <td>${transaction.payee}</td>
       <td>${transaction.category || '-'}</td>
-      <td>${transaction.type === 'debit' ? '$' + parseFloat(transaction.amount).toFixed(2) : '-'}</td>
-      <td>${transaction.type === 'credit' ? '$' + parseFloat(transaction.amount).toFixed(2) : '-'}</td>
-      <td>$${balance.toFixed(2)}</td>
+      <td>${transaction.type === 'debit' ? '$' + formatCurrency(transaction.amount) : '-'}</td>
+      <td>${transaction.type === 'credit' ? '$' + formatCurrency(transaction.amount) : '-'}</td>
+      <td>$${formatCurrency(balance)}</td>
       <td>
         <span class="badge ${transaction.isReconciled ? 'badge-success' : 'badge-warning'}">
           ${transaction.isReconciled ? 'Reconciled' : 'Unreconciled'}
@@ -728,7 +740,7 @@ function startReconciliation() {
         <input type="checkbox" class="checkbox checkbox-primary reconcile-checkbox" data-id="${transaction.id}">
         <span class="label-text">
           ${transaction.date} - ${transaction.payee} - 
-          ${transaction.type === 'debit' ? '-' : '+'}$${parseFloat(transaction.amount).toFixed(2)}
+          ${transaction.type === 'debit' ? '-' : '+'}$${formatCurrency(transaction.amount)}
         </span>
       </label>
     `;
@@ -1115,7 +1127,7 @@ function displayCsvPreview(transactions) {
               </div>
               <div class="text-right">
                 <div class="font-bold text-lg ${transaction.type === 'debit' ? 'text-error' : 'text-success'}">
-                  ${transaction.type === 'debit' ? '-' : '+'}$${parseFloat(transaction.amount).toFixed(2)}
+                  ${transaction.type === 'debit' ? '-' : '+'}$${formatCurrency(transaction.amount)}
                 </div>
                 <select class="select select-xs mt-1" data-index="${index}" onchange="updateCsvTransactionType(${index}, this.value)">
                   <option value="debit" ${transaction.type === 'debit' ? 'selected' : ''}>Debit</option>
@@ -1174,7 +1186,7 @@ function displayCsvPreview(transactions) {
                   ${tx.checkNumber ? `<div class="text-xs text-base-content/60">Check #${tx.checkNumber}</div>` : ''}
                 </div>
                 <div class="font-bold ${tx.type === 'debit' ? 'text-error' : 'text-success'}">
-                  ${tx.type === 'debit' ? '-' : '+'}$${parseFloat(tx.amount).toFixed(2)}
+                  ${tx.type === 'debit' ? '-' : '+'}$${formatCurrency(tx.amount)}
                 </div>
               </div>
             </div>
