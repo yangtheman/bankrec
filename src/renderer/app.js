@@ -1145,26 +1145,30 @@ function displayCsvPreview(transactions) {
     
     // Add matching transactions as radio options
     if (matches.length > 0) {
-      cardHTML += `<div class="divider my-1 text-xs">OR match with unreconciled transaction</div>`;
+      cardHTML += `<div class="divider my-1 text-xs">OR match with existing transaction</div>`;
       
       matches.forEach((match, matchIdx) => {
         const tx = match.transaction;
         const txDate = new Date(tx.date);
         const csvDate = new Date(transaction.date);
         const daysDiff = Math.abs((csvDate - txDate) / (1000 * 60 * 60 * 24));
+        const isReconciled = tx.isReconciled || tx.reconciled;
         
         cardHTML += `
-          <label class="flex items-start gap-3 p-2 rounded hover:bg-base-200 cursor-pointer border border-base-300">
+          <label class="flex items-start gap-3 p-2 rounded hover:bg-base-200 cursor-pointer border ${isReconciled ? 'border-success/40 bg-success/5' : 'border-base-300'}">
             <input type="radio" 
                    name="csv-match-${index}" 
                    value="match:${tx.id}" 
                    class="radio radio-primary radio-sm mt-0.5"
-                   ${matchIdx === 0 ? 'checked' : ''}>
+                   ${matchIdx === 0 && !isReconciled ? 'checked' : ''}>
             <div class="flex-1">
               <div class="flex justify-between items-start">
                 <div>
-                  <span class="font-medium">${tx.date}</span>
-                  ${daysDiff > 0 ? `<span class="text-xs text-warning ml-1">(${Math.round(daysDiff)} day${daysDiff !== 1 ? 's' : ''} diff)</span>` : ''}
+                  <div class="flex items-center gap-2">
+                    <span class="font-medium">${tx.date}</span>
+                    ${daysDiff > 0 ? `<span class="text-xs text-warning ml-1">(${Math.round(daysDiff)} day${daysDiff !== 1 ? 's' : ''} diff)</span>` : ''}
+                    ${isReconciled ? `<span class="badge badge-success badge-xs">Already Reconciled</span>` : ''}
+                  </div>
                   <div class="text-sm">${tx.payee}</div>
                   ${tx.category ? `<div class="text-xs text-base-content/60">Category: ${tx.category}</div>` : ''}
                   ${tx.checkNumber ? `<div class="text-xs text-base-content/60">Check #${tx.checkNumber}</div>` : ''}
@@ -1178,7 +1182,7 @@ function displayCsvPreview(transactions) {
         `;
       });
     } else {
-      cardHTML += `<div class="text-xs text-base-content/60 italic pl-2">No matching unreconciled transactions found</div>`;
+      cardHTML += `<div class="text-xs text-base-content/60 italic pl-2">No matching transactions found</div>`;
     }
     
     cardHTML += `
@@ -1205,12 +1209,19 @@ function findMatchesForCsvRow(csvRow) {
   const targetType = csvRow.type || null;
   const targetDate = csvRow.date ? new Date(csvRow.date) : null;
 
-  // Search unreconciled transactions
-  const candidates = appData.transactions.filter(t => !t.isReconciled);
+  // Search ALL transactions (including already reconciled ones)
+  const candidates = appData.transactions;
 
   candidates.forEach(tx => {
     const txAmount = Math.abs(parseFloat(tx.amount));
     if (Math.abs(txAmount - targetAmount) > 0.01) return; // amount must match
+
+    // Filter by date range: +/- 10 days
+    if (targetDate && tx.date) {
+      const txDate = new Date(tx.date);
+      const daysDiff = Math.abs((targetDate - txDate) / (1000 * 60 * 60 * 24));
+      if (daysDiff > 10) return; // Skip if outside date range
+    }
 
     // Scoring: prefer same type and closer dates
     let score = 0;
