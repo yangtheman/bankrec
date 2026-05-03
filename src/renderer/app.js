@@ -25,7 +25,8 @@ function formatCurrency(amount) {
 // Initialize app on load
 document.addEventListener('DOMContentLoaded', async () => {
   console.log('App loaded, checking for existing data...');
-  
+  loadSavedTheme();
+
   try {
     const keyResult = await window.electronAPI.encryptionHasKey();
     
@@ -241,13 +242,31 @@ async function continueToApp() {
   }
 }
 
+function loadSavedTheme() {
+  const savedTheme = localStorage.getItem('bankrec-theme') || 'light';
+  const html = document.documentElement;
+  html.setAttribute('data-theme', savedTheme);
+
+  // Update icons to match saved theme
+  const sunIcon = document.getElementById('theme-icon-sun');
+  const moonIcon = document.getElementById('theme-icon-moon');
+  if (savedTheme === 'dark') {
+    sunIcon.classList.add('hidden');
+    moonIcon.classList.remove('hidden');
+  } else {
+    sunIcon.classList.remove('hidden');
+    moonIcon.classList.add('hidden');
+  }
+}
+
 function toggleTheme() {
   const html = document.documentElement;
   const currentTheme = html.getAttribute('data-theme');
   const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-  
+
   html.setAttribute('data-theme', newTheme);
-  
+  localStorage.setItem('bankrec-theme', newTheme);
+
   document.getElementById('theme-icon-sun').classList.toggle('hidden');
   document.getElementById('theme-icon-moon').classList.toggle('hidden');
 }
@@ -295,7 +314,12 @@ function filterTransactions() {
     return matchesSearch && matchesStartDate && matchesEndDate;
   });
   
-  filteredTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+  filteredTransactions.sort((a, b) => {
+    const dateCompare = new Date(b.date) - new Date(a.date);
+    if (dateCompare !== 0) return dateCompare;
+    // For same dates, sort by creation time DESC (reverse of calc order) so balances flow correctly
+    return new Date(b.createdAt) - new Date(a.createdAt);
+  });
   
   currentPage = 1;
   renderPaginatedTransactions();
@@ -322,8 +346,8 @@ function renderPaginatedTransactions() {
   const sortedAllTransactions = [...appData.transactions].sort((a, b) => {
     const dateCompare = new Date(a.date) - new Date(b.date);
     if (dateCompare !== 0) return dateCompare;
-    // If dates are equal, maintain stable sort by id
-    return a.id.localeCompare(b.id);
+    // If dates are equal, sort by creation time
+    return new Date(a.createdAt) - new Date(b.createdAt);
   });
   
   let runningBalance = 0;

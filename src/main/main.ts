@@ -290,6 +290,7 @@ ipcMain.handle("load-data", async (_event, email?: string) => {
       isReconciled: t.is_reconciled === 1, // Keep for compatibility
       accountId: t.account_id,
       checkNumber: t.check_number || null,
+      createdAt: t.created_at, // Include for stable sorting
       source: "manual",
     }));
 
