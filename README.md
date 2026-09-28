@@ -134,13 +134,13 @@ This will:
 ```bash
 yarn build:mac
 ```
-Output: `dist/BankRec-1.0.0.dmg` and `dist/BankRec-1.0.0-mac.zip`
+Output: `release/BankRec-1.0.0.dmg` and `release/BankRec-1.0.0-mac.zip`
 
 ### Build for Windows:
 ```bash
 yarn build:win
 ```
-Output: `dist/BankRec Setup 1.0.0.exe` and `dist/BankRec 1.0.0.exe` (portable)
+Output: `release/BankRec Setup 1.0.0.exe` and `release/BankRec 1.0.0.exe` (portable)
 
 ### Build for both platforms:
 ```bash
