@@ -147,6 +147,7 @@
                         </svg>
                         Add Transaction
                     </button>
+                    <button id="find-duplicates-btn" class="btn btn-neutral">Find Duplicates</button>
                     <button id="import-csv-btn" class="btn btn-neutral">Import CSV</button>
                     <button id="import-btn" class="btn btn-neutral">Import DB</button>
                     <button id="export-btn" class="btn btn-neutral">Export DB</button>
@@ -246,6 +247,19 @@
             <div class="modal-action">
                 <button id="save-reconciliation-btn" class="btn btn-primary">Save</button>
                 <button id="cancel-reconciliation-btn" class="btn btn-ghost">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Duplicates Modal -->
+    <div id="duplicates-modal" class="modal">
+        <div class="modal-box max-w-3xl">
+            <h2 class="font-bold text-2xl mb-2">Possible Duplicates</h2>
+            <p class="text-sm text-base-content/70 mb-4">Transactions with the same amount and type within 5 days of each other. Select the ones to delete.</p>
+            <div id="duplicates-list" class="mb-4"></div>
+            <div class="modal-action">
+                <button id="delete-duplicates-btn" class="btn btn-error">Delete Selected</button>
+                <button id="cancel-duplicates-btn" class="btn btn-ghost">Close</button>
             </div>
         </div>
     </div>

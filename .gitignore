@@ -74,3 +74,6 @@ temp/
 
 # macOS code signing
 *.provisionprofile
+
+# Serena MCP project data (auto-created by Headroom-installed Serena)
+.serena/

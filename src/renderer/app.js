@@ -84,6 +84,7 @@ function setupEventListeners() {
   document.getElementById('export-btn').addEventListener('click', openExportDialog);
   document.getElementById('import-btn').addEventListener('click', openImportDialog);
   document.getElementById('import-csv-btn').addEventListener('click', openCsvImport);
+  document.getElementById('find-duplicates-btn').addEventListener('click', openDuplicatesModal);
   document.getElementById('start-reconciliation-btn').addEventListener('click', startReconciliation);
   
   document.getElementById('transaction-form').addEventListener('submit', saveTransaction);
@@ -108,6 +109,9 @@ function setupEventListeners() {
   document.getElementById('save-reconciliation-btn').addEventListener('click', saveReconciliation);
   document.getElementById('cancel-reconciliation-btn').addEventListener('click', closeReconciliationModal);
   
+  document.getElementById('delete-duplicates-btn').addEventListener('click', deleteSelectedDuplicates);
+  document.getElementById('cancel-duplicates-btn').addEventListener('click', closeDuplicatesModal);
+
   document.getElementById('close-settings-btn').addEventListener('click', closeSettingsModal);
   document.getElementById('change-db-path-btn').addEventListener('click', changeDbPath);
   
@@ -812,6 +816,109 @@ async function saveReconciliation() {
 
 function closeReconciliationModal() {
   document.getElementById('reconciliation-modal').classList.remove('modal-open');
+}
+
+// Groups transactions with the same amount and type whose dates are within
+// windowDays of a neighbor in the group (chained, so a group may span longer).
+function findDuplicateGroups(transactions, windowDays = 5) {
+  const DAY_MS = 24 * 60 * 60 * 1000;
+  const byAmount = new Map();
+
+  transactions.forEach(t => {
+    const key = `${t.type}:${Math.round(parseFloat(t.amount) * 100)}`;
+    if (!byAmount.has(key)) byAmount.set(key, []);
+    byAmount.get(key).push(t);
+  });
+
+  const groups = [];
+  byAmount.forEach(list => {
+    if (list.length < 2) return;
+    list.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    let current = [list[0]];
+    for (let i = 1; i < list.length; i++) {
+      const gap = (new Date(list[i].date) - new Date(list[i - 1].date)) / DAY_MS;
+      if (gap <= windowDays) {
+        current.push(list[i]);
+      } else {
+        if (current.length > 1) groups.push(current);
+        current = [list[i]];
+      }
+    }
+    if (current.length > 1) groups.push(current);
+  });
+
+  groups.sort((a, b) => new Date(b[0].date) - new Date(a[0].date));
+  return groups;
+}
+
+function openDuplicatesModal() {
+  const groups = findDuplicateGroups(appData.transactions);
+
+  if (groups.length === 0) {
+    alert('No possible duplicates found');
+    return;
+  }
+
+  const list = document.getElementById('duplicates-list');
+  list.innerHTML = '';
+
+  groups.forEach(group => {
+    const card = document.createElement('div');
+    card.classList.add('border', 'border-base-300', 'rounded-lg', 'p-3', 'mb-3');
+    card.innerHTML = group.map(transaction => `
+      <label class="label cursor-pointer justify-start items-start gap-3 whitespace-normal py-1">
+        <input type="checkbox" class="checkbox checkbox-error shrink-0 duplicate-checkbox" data-id="${transaction.id}">
+        <span class="label-text min-w-0 wrap-break-word">
+          ${transaction.date} - ${transaction.checkNumber ? '#' + transaction.checkNumber + ' - ' : ''}${transaction.payee} -
+          ${transaction.type === 'debit' ? '-' : '+'}$${formatCurrency(transaction.amount)}
+          <span class="badge badge-sm ${transaction.isReconciled ? 'badge-success' : 'badge-warning'}">
+            ${transaction.isReconciled ? 'Reconciled' : 'Unreconciled'}
+          </span>
+        </span>
+      </label>
+    `).join('');
+    list.appendChild(card);
+  });
+
+  document.getElementById('duplicates-modal').classList.add('modal-open');
+}
+
+async function deleteSelectedDuplicates() {
+  const checkboxes = document.querySelectorAll('.duplicate-checkbox:checked');
+
+  if (checkboxes.length === 0) {
+    alert('Please select at least one transaction to delete');
+    return;
+  }
+
+  if (!confirm(`Are you sure you want to delete ${checkboxes.length} transaction(s)?`)) {
+    return;
+  }
+
+  try {
+    for (const checkbox of checkboxes) {
+      const result = await window.electronAPI.deleteTransaction(checkbox.dataset.id);
+      if (!result.success) {
+        throw new Error(result.error);
+      }
+    }
+  } catch (error) {
+    console.error('Error deleting duplicates:', error);
+    alert('Error deleting transactions: ' + error.message);
+  }
+
+  const loadResult = await window.electronAPI.loadData();
+  if (loadResult.success && loadResult.data) {
+    appData = loadResult.data;
+    renderUI();
+  }
+
+  closeDuplicatesModal();
+}
+
+function closeDuplicatesModal() {
+  document.getElementById('duplicates-modal').classList.remove('modal-open');
 }
 
 async function openSettings() {
